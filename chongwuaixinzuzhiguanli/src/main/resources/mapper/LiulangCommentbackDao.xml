@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LiulangCommentbackDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.liulang_id as liulangId
+        ,a.yonghu_id as yonghuId
+        ,a.liulang_commentback_text as liulangCommentbackText
+        ,a.insert_time as insertTime
+        ,a.reply_text as replyText
+        ,a.update_time as updateTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LiulangCommentbackView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,liulang.liulang_name as liulangName
+        ,liulang.liulang_uuid_number as liulangUuidNumber
+        ,liulang.liulang_photo as liulangPhoto
+        ,liulang.liulang_types as liulangTypes
+        ,liulang.liulang_content as liulangContent
+        ,liulang.liulang_delete as liulangDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_types as yonghuTypes
+        ,yonghu.new_money as newMoney
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM liulang_commentback  a
+        left JOIN liulang liulang ON a.liulang_id = liulang.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.liulangId != null and params.liulangId != ''">
+                and (
+                    a.liulang_id = #{params.liulangId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.liulangCommentbackText != '' and params.liulangCommentbackText != null and params.liulangCommentbackText != 'null' ">
+                and a.liulang_commentback_text like CONCAT('%',#{params.liulangCommentbackText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+            <if test=" params.replyText != '' and params.replyText != null and params.replyText != 'null' ">
+                and a.reply_text like CONCAT('%',#{params.replyText},'%')
+            </if>
+            <if test=" params.updateTimeStart != '' and params.updateTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.update_time) >= UNIX_TIMESTAMP(#{params.updateTimeStart}) ]]>
+            </if>
+            <if test=" params.updateTimeEnd != '' and params.updateTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.update_time) <= UNIX_TIMESTAMP(#{params.updateTimeEnd}) ]]>
+            </if>
+            <if test="params.updateTime != null and params.updateTime != ''">
+                and a.update_time = #{params.updateTime}
+            </if>
+
+                <!-- 判断流浪的id不为空 -->
+            <if test=" params.liulangIdNotNull != '' and params.liulangIdNotNull != null and params.liulangIdNotNull != 'null' ">
+                and a.liulang_id IS NOT NULL
+            </if>
+            <if test=" params.liulangName != '' and params.liulangName != null and params.liulangName != 'null' ">
+                and liulang.liulang_name like CONCAT('%',#{params.liulangName},'%')
+            </if>
+            <if test=" params.liulangUuidNumber != '' and params.liulangUuidNumber != null and params.liulangUuidNumber != 'null' ">
+                and liulang.liulang_uuid_number like CONCAT('%',#{params.liulangUuidNumber},'%')
+            </if>
+            <if test="params.liulangTypes != null  and params.liulangTypes != ''">
+                and liulang.liulang_types = #{params.liulangTypes}
+            </if>
+
+            <if test=" params.liulangContent != '' and params.liulangContent != null and params.liulangContent != 'null' ">
+                and liulang.liulang_content like CONCAT('%',#{params.liulangContent},'%')
+            </if>
+            <if test="params.liulangDeleteStart != null  and params.liulangDeleteStart != '' ">
+                <![CDATA[  and liulang.liulang_delete >= #{params.liulangDeleteStart}   ]]>
+            </if>
+            <if test="params.liulangDeleteEnd != null  and params.liulangDeleteEnd != '' ">
+                <![CDATA[  and liulang.liulang_delete <= #{params.liulangDeleteEnd}   ]]>
+            </if>
+            <if test="params.liulangDelete != null  and params.liulangDelete != '' ">
+                and liulang.liulang_delete = #{params.liulangDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(liulang.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(liulang.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test="params.yonghuTypes != null  and params.yonghuTypes != ''">
+                and yonghu.yonghu_types = #{params.yonghuTypes}
+            </if>
+
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

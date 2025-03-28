@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.TuanduiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.tuandui_name as tuanduiName
+        ,a.tuandui_uuid_number as tuanduiUuidNumber
+        ,a.tuandui_photo as tuanduiPhoto
+        ,a.huodong_time as huodongTime
+        ,a.tuandui_types as tuanduiTypes
+        ,a.tuandui_content as tuanduiContent
+        ,a.tuandui_delete as tuanduiDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.TuanduiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM tuandui  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.tuanduiName != '' and params.tuanduiName != null and params.tuanduiName != 'null' ">
+                and a.tuandui_name like CONCAT('%',#{params.tuanduiName},'%')
+            </if>
+            <if test=" params.tuanduiUuidNumber != '' and params.tuanduiUuidNumber != null and params.tuanduiUuidNumber != 'null' ">
+                and a.tuandui_uuid_number like CONCAT('%',#{params.tuanduiUuidNumber},'%')
+            </if>
+            <if test=" params.huodongTimeStart != '' and params.huodongTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.huodong_time) >= UNIX_TIMESTAMP(#{params.huodongTimeStart}) ]]>
+            </if>
+            <if test=" params.huodongTimeEnd != '' and params.huodongTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.huodong_time) <= UNIX_TIMESTAMP(#{params.huodongTimeEnd}) ]]>
+            </if>
+            <if test="params.huodongTime != null and params.huodongTime != ''">
+                and a.huodong_time = #{params.huodongTime}
+            </if>
+            <if test="params.tuanduiTypes != null and params.tuanduiTypes != ''">
+                and a.tuandui_types = #{params.tuanduiTypes}
+            </if>
+            <if test=" params.tuanduiContent != '' and params.tuanduiContent != null and params.tuanduiContent != 'null' ">
+                and a.tuandui_content like CONCAT('%',#{params.tuanduiContent},'%')
+            </if>
+            <if test="params.tuanduiDeleteStart != null and params.tuanduiDeleteStart != ''">
+                <![CDATA[  and a.tuandui_delete >= #{params.tuanduiDeleteStart}   ]]>
+            </if>
+            <if test="params.tuanduiDeleteEnd != null and params.tuanduiDeleteEnd != ''">
+                <![CDATA[  and a.tuandui_delete <= #{params.tuanduiDeleteEnd}   ]]>
+            </if>
+             <if test="params.tuanduiDelete != null and params.tuanduiDelete != ''">
+                and a.tuandui_delete = #{params.tuanduiDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
